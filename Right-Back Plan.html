@@ -1,0 +1,623 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Right-Back Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one narrow column built for phones. Hero, sticky tabs, then colour-coded day cards. */
+:root {
+  --bg: #f1f5f2;
+  --panel: #ffffff;
+  --fg: #14201a;
+  --muted: #56695d;
+  --line: #d3ddd6;
+  --accent: #178a47;
+  --accent-ink: #ffffff;
+  --pitch: #1d6b3a;
+  --chalk: #f4f8f2;
+  --stamina: #d9560f;
+  --upper: #2f6fe0;
+  --speed: #f2b705;
+  --legs: #7a3fd1;
+  --engine: #d92f47;
+  --match: #178a47;
+  --rest: #2a8a91;
+  --rehab: #d6407f;
+  --fuel: #b86a00;
+  --font-display: "Barlow Condensed", "Arial Narrow", "Helvetica Neue", sans-serif;
+  --font-body: "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1512; --panel: #17211b; --fg: #e9f1ec; --muted: #9bb0a2; --line: #2a3a30;
+    --accent: #4fd184; --accent-ink: #07140c; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1512; --panel: #17211b; --fg: #e9f1ec; --muted: #9bb0a2; --line: #2a3a30;
+  --accent: #4fd184; --accent-ink: #07140c; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 16px; line-height: 1.45; }
+body.has-timer { padding-bottom: 250px; }
+.app { max-width: 720px; margin: 0 auto; padding-inline: 16px; padding-block: 16px 40px; display: flex; flex-direction: column; gap: 16px; }
+h1, h2, h3 { margin: 0; font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.02em; text-wrap: balance; }
+p { margin: 0; }
+button { font-family: inherit; }
+button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+/* Hero */
+.hero { background: var(--pitch); color: var(--chalk); border-radius: 14px; padding: 18px; display: grid; gap: 14px; }
+.hero .kick { font: 600 12px/1 var(--font-body); letter-spacing: 0.14em; text-transform: uppercase; color: #ffd23f; }
+.hero h1 { font-size: 64px; line-height: 0.9; font-weight: 700; }
+.hero .sub { max-width: 34ch; opacity: 0.95; }
+.hero svg { width: 100%; height: auto; display: block; border-radius: 8px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font: 600 13px/1 var(--font-body); padding: 8px 12px; border-radius: 999px; background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.3); }
+.order { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.order div { padding: 10px 8px; border-radius: 8px; color: #fff; font: 700 17px/1.1 var(--font-display); text-transform: uppercase; letter-spacing: 0.03em; text-align: center; }
+.order small { display: block; font: 500 12px/1.3 var(--font-body); text-transform: none; letter-spacing: 0; margin-top: 3px; opacity: 0.95; }
+.o1 { background: var(--stamina); } .o2 { background: #8a6a00; } .o3 { background: var(--upper); }
+
+/* Tabs */
+.tabs { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding-block: 8px; background: var(--bg); }
+.tab { min-height: 48px; border: 2px solid var(--line); background: var(--panel); color: var(--fg); border-radius: 10px; font: 700 18px var(--font-display); text-transform: uppercase; letter-spacing: 0.04em; cursor: pointer; }
+.tab[aria-selected="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+
+.stack { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.seg { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.seg button { min-height: 44px; border-radius: 10px; border: 2px solid var(--line); background: var(--panel); color: var(--fg); font: 600 15px var(--font-body); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.note { color: var(--muted); font-size: 15px; }
+.tips { display: grid; gap: 8px; }
+.tip { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font-size: 15px; }
+.tip b { font-weight: 600; }
+
+/* Cards */
+.card { --c: var(--accent); --ink: #fff; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.stamina { --c: var(--stamina); } .upper { --c: var(--upper); } .speed { --c: var(--speed); --ink: #1d1600; }
+.legs { --c: var(--legs); } .engine { --c: var(--engine); } .match { --c: var(--match); } .rest { --c: var(--rest); }
+.rehab { --c: var(--rehab); } .fuel { --c: var(--fuel); }
+.card-h { background: var(--c); color: var(--ink); padding: 12px 14px; display: flex; align-items: center; gap: 12px; }
+.abbr { font: 700 40px/1 var(--font-display); letter-spacing: 0.02em; min-width: 62px; }
+.card-h .ttl { flex: 1; min-width: 0; }
+.card-h h2 { font-size: 26px; line-height: 1; }
+.card-h .bl { font-size: 14px; opacity: 0.95; margin-top: 3px; }
+.done-btn { min-height: 44px; padding: 0 12px; border-radius: 999px; border: 2px solid currentColor; background: transparent; color: var(--ink); font: 700 14px var(--font-body); cursor: pointer; white-space: nowrap; }
+.done-btn[aria-pressed="true"] { background: var(--ink); color: var(--c); }
+.card.is-done .card-h { filter: saturate(0.6); }
+.card-b { padding: 6px 14px 14px; display: flex; flex-direction: column; }
+.ex { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.ex:last-child { border-bottom: 0; }
+.ex-name { font: 700 19px/1.15 var(--font-display); text-transform: uppercase; letter-spacing: 0.02em; }
+.ex-det { color: var(--muted); font-size: 15px; margin-top: 2px; }
+.ex.plain { grid-template-columns: 1fr; }
+.go { min-height: 44px; min-width: 96px; padding: 0 14px; border: 0; border-radius: 10px; background: var(--c); color: var(--ink); font: 700 15px var(--font-body); cursor: pointer; }
+.go.rest { background: transparent; color: var(--fg); border: 2px solid var(--line); }
+.bar-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.bar-row.last { border-bottom: 0; border-top: 1px solid var(--line); }
+.bar-row .t { font: 600 15px var(--font-body); color: var(--muted); }
+.bar-row .t b { color: var(--fg); font-weight: 600; }
+
+/* Rehab */
+.areas { display: flex; flex-wrap: wrap; gap: 8px; }
+.area { min-height: 44px; padding: 0 16px; border-radius: 999px; border: 2px solid var(--line); background: var(--panel); color: var(--fg); font: 600 15px var(--font-body); cursor: pointer; }
+.area[aria-pressed="true"] { background: var(--rehab); border-color: var(--rehab); color: #fff; }
+.warn { background: var(--panel); border: 2px solid var(--engine); border-radius: 12px; padding: 12px 14px; display: grid; gap: 6px; }
+.warn h3 { font-size: 20px; color: var(--engine); }
+.warn ul { margin: 0; padding-left: 20px; display: grid; gap: 3px; font-size: 15px; }
+.callout { border-left: 5px solid var(--c); background: var(--panel); border-radius: 0 10px 10px 0; padding: 10px 12px; font-size: 15px; margin-top: 8px; }
+
+/* Fuel */
+.pills { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 10px; }
+.pill { padding: 9px 13px; border-radius: 999px; background: color-mix(in srgb, var(--c) 16%, var(--panel)); border: 1px solid color-mix(in srgb, var(--c) 45%, var(--panel)); font-weight: 500; font-size: 15px; }
+.timeline { display: flex; flex-direction: column; gap: 0; }
+.tl { display: grid; grid-template-columns: 112px 1fr; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.tl:last-child { border-bottom: 0; }
+.tl .when { font: 700 19px/1.1 var(--font-display); text-transform: uppercase; color: var(--c); }
+.foot { color: var(--muted); font-size: 13px; }
+
+/* Timer */
+.timer { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: #0b1a11; color: #fff; padding: 12px 16px calc(14px + env(safe-area-inset-bottom, 0px)); box-shadow: 0 -8px 24px rgba(0,0,0,0.35); border-top: 4px solid var(--stamina); }
+.timer[data-kind="rest"] { border-top-color: var(--rest); }
+.timer[data-kind="done"] { border-top-color: var(--match); }
+.t-in { max-width: 720px; margin: 0 auto; display: grid; gap: 8px; }
+.t-top { display: flex; justify-content: space-between; gap: 12px; align-items: center; font: 600 13px var(--font-body); letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.8; }
+.t-top span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.t-main { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+#t-label { font: 700 34px/1 var(--font-display); text-transform: uppercase; min-width: 0; }
+#t-clock { font: 700 68px/1 var(--font-display); font-variant-numeric: tabular-nums; }
+.t-track { height: 8px; border-radius: 4px; background: rgba(255,255,255,0.18); overflow: hidden; }
+#t-fill { display: block; height: 100%; width: 0; background: var(--stamina); }
+.timer[data-kind="rest"] #t-fill { background: var(--rest); }
+.timer[data-kind="done"] #t-fill { background: var(--match); }
+#t-next { font-size: 14px; opacity: 0.8; }
+.t-ctl { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.t-ctl button, #t-close { min-height: 46px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.35); background: transparent; color: #fff; font: 700 15px var(--font-body); cursor: pointer; }
+#t-close { min-height: 0; border: 0; padding: 4px 0; font: 600 13px var(--font-body); letter-spacing: 0.1em; text-transform: uppercase; opacity: 1; }
+@media (max-width: 380px) { .hero h1 { font-size: 54px; } #t-clock { font-size: 56px; } .tl { grid-template-columns: 92px 1fr; } }
+@media (prefers-reduced-motion: no-preference) { #t-fill { transition: width 0.25s linear; } }
+</style>
+
+<div class="app">
+  <header class="hero">
+    <div class="kick">Your position</div>
+    <h1>Right-back</h1>
+    <p class="sub">Defend your side, pass short and simple, then join the attack late to get your goals.</p>
+    <svg viewBox="0 0 420 270" role="img" aria-label="Pitch with the right-back position highlighted on the right side of the defence">
+      <rect x="0" y="0" width="420" height="270" fill="#165a30"/>
+      <g fill="none" stroke="#f4f8f2" stroke-width="2" opacity="0.85">
+        <rect x="10" y="10" width="400" height="250"/>
+        <line x1="210" y1="10" x2="210" y2="260"/>
+        <circle cx="210" cy="135" r="30"/>
+        <rect x="10" y="75" width="52" height="120"/>
+        <rect x="358" y="75" width="52" height="120"/>
+      </g>
+      <g fill="#2f7df6" stroke="#f4f8f2" stroke-width="2">
+        <circle cx="36" cy="135" r="9"/><circle cx="96" cy="52" r="9"/><circle cx="86" cy="105" r="9"/><circle cx="86" cy="165" r="9"/>
+        <circle cx="180" cy="80" r="9"/><circle cx="165" cy="135" r="9"/><circle cx="180" cy="190" r="9"/>
+        <circle cx="290" cy="55" r="9"/><circle cx="310" cy="135" r="9"/><circle cx="290" cy="215" r="9"/>
+      </g>
+      <path d="M112 218 L262 226" stroke="#ffd23f" stroke-width="4" stroke-dasharray="9 7" stroke-linecap="round" fill="none"/>
+      <polygon points="276,227 258,217 256,236" fill="#ffd23f"/>
+      <circle cx="96" cy="218" r="15" fill="#ffd23f" stroke="#f4f8f2" stroke-width="3"/>
+      <text x="96" y="219" text-anchor="middle" dominant-baseline="central" font-family="Barlow Condensed, Arial Narrow, sans-serif" font-weight="700" font-size="15" fill="#1d1600">RB</text>
+      <text x="210" y="252" text-anchor="middle" font-family="Barlow, sans-serif" font-weight="600" font-size="12" fill="#f4f8f2" opacity="0.9">Attacking this way: your overlap run on the right</text>
+    </svg>
+    <div class="chips"><span class="chip">Good at defending</span><span class="chip">Short passing</span><span class="chip">Calm and focused</span><span class="chip">6 ft: use it in the air</span></div>
+    <div class="order" aria-label="Build in this order">
+      <div class="o1">1 Stamina<small>Run for 90 min</small></div>
+      <div class="o2">2 Speed<small>Beat the winger</small></div>
+      <div class="o3">3 Muscle and abs<small>Show your six-pack</small></div>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Sections">
+    <button class="tab" role="tab" id="tab-plan" data-tab="plan" aria-selected="true">Plan</button>
+    <button class="tab" role="tab" id="tab-rehab" data-tab="rehab" aria-selected="false">Rehab</button>
+    <button class="tab" role="tab" id="tab-fuel" data-tab="fuel" aria-selected="false">Fuel</button>
+  </nav>
+
+  <main id="view" class="stack"></main>
+
+  <p class="foot">General fitness guidance, not medical advice. Stop and see a doctor or physio if you have sharp pain, swelling or numbness.</p>
+</div>
+
+<div class="timer" id="timer" data-kind="work" hidden role="status" aria-live="polite">
+  <div class="t-in">
+    <div class="t-top"><span id="t-title">Timer</span><button id="t-close">Close</button></div>
+    <div class="t-main"><div id="t-label">Ready</div><div id="t-clock">0:00</div></div>
+    <div class="t-track"><i id="t-fill"></i></div>
+    <div id="t-next"></div>
+    <div class="t-ctl">
+      <button id="t-pause">Pause</button>
+      <button id="t-skip">Skip</button>
+      <button id="t-restart">Restart</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ---------- tiny helpers ---------- */
+  function h(tag, cls, txt, kids) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (txt != null) e.textContent = txt;
+    if (kids) kids.forEach(function (k) { if (k) e.appendChild(k); });
+    return e;
+  }
+  function fmt(s) { var m = Math.floor(s / 60), r = s % 60; return m + ':' + (r < 10 ? '0' : '') + r; }
+  function total(segs) { return segs.reduce(function (a, s) { return a + s.secs; }, 0); }
+  function intervals(label, work, rest, rounds, restLabel) {
+    var out = [];
+    for (var r = 1; r <= rounds; r++) {
+      out.push({ label: rounds > 1 ? label + ' ' + r + ' of ' + rounds : label, secs: work, kind: 'work' });
+      if (rest && r < rounds) out.push({ label: restLabel || 'Rest', secs: rest, kind: 'rest' });
+    }
+    return out;
+  }
+  function seq(list) {
+    return list.map(function (a) { return { label: a[0], secs: a[1], kind: /^(rest|walk|easy walk)/i.test(a[0]) ? 'rest' : 'work' }; });
+  }
+  function sides(label, secs, rounds, rest) {
+    var out = [];
+    for (var r = 1; r <= rounds; r++) {
+      out.push({ label: label + ', left', secs: secs, kind: 'work' });
+      out.push({ label: label + ', right', secs: secs, kind: 'work' });
+      if (rest && r < rounds) out.push({ label: 'Rest', secs: rest, kind: 'rest' });
+    }
+    return out;
+  }
+
+  /* ---------- saved state (this phone only) ---------- */
+  var KEY = 'right-back-plan-v1';
+  var S = { tab: 'plan', week: 1, done: {}, area: 'daily' };
+  try {
+    var o = JSON.parse(localStorage.getItem(KEY));
+    if (o) {
+      if (['plan', 'rehab', 'fuel'].indexOf(o.tab) > -1) S.tab = o.tab;
+      S.week = o.week === 2 ? 2 : 1;
+      if (o.done && typeof o.done === 'object') S.done = o.done;
+      if (typeof o.area === 'string') S.area = o.area;
+    }
+  } catch (e) {}
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+
+  /* ---------- timer ---------- */
+  var T = null, tickId = null, actx = null, wake = null;
+  var el = {
+    box: document.getElementById('timer'), title: document.getElementById('t-title'),
+    label: document.getElementById('t-label'), clock: document.getElementById('t-clock'),
+    fill: document.getElementById('t-fill'), next: document.getElementById('t-next'),
+    pause: document.getElementById('t-pause')
+  };
+  function beep(freq, dur) {
+    try {
+      if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+      if (actx.state === 'suspended') actx.resume();
+      var o = actx.createOscillator(), g = actx.createGain();
+      o.frequency.value = freq; g.gain.value = 0.15;
+      o.connect(g); g.connect(actx.destination);
+      o.start(); o.stop(actx.currentTime + dur);
+    } catch (e) {}
+  }
+  function buzz(p) { try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} }
+
+  function startTimer(title, segs) {
+    stopTimer();
+    T = { title: title, segs: segs, i: 0, paused: false, done: false, left: segs[0].secs, endAt: Date.now() + segs[0].secs * 1000, pausedMs: 0 };
+    el.box.hidden = false;
+    document.body.classList.add('has-timer');
+    beep(660, 0.15); buzz(60);
+    tickId = setInterval(tick, 200);
+    try {
+      if (navigator.wakeLock && navigator.wakeLock.request) {
+        navigator.wakeLock.request('screen').then(function (l) { wake = l; }).catch(function () {});
+      }
+    } catch (e) {}
+    paint();
+  }
+  function stopTimer() {
+    if (tickId) { clearInterval(tickId); tickId = null; }
+    T = null;
+    el.box.hidden = true;
+    document.body.classList.remove('has-timer');
+    try { if (wake && wake.release) wake.release(); } catch (e) {}
+    wake = null;
+  }
+  function tick() {
+    if (!T || T.paused || T.done) return;
+    var left = Math.ceil((T.endAt - Date.now()) / 1000);
+    if (left <= 0) { advance(); return; }
+    if (left !== T.left) { T.left = left; if (left <= 3) beep(520, 0.08); }
+    paint();
+  }
+  function advance() {
+    if (!T || T.done) return;
+    T.i++;
+    if (T.i >= T.segs.length) {
+      clearInterval(tickId); tickId = null; T.done = true;
+      beep(880, 0.2); setTimeout(function () { beep(1046, 0.35); }, 250); buzz([200, 100, 200]);
+      paint(); return;
+    }
+    var s = T.segs[T.i];
+    T.left = s.secs; T.endAt = Date.now() + s.secs * 1000;
+    beep(s.kind === 'rest' ? 440 : 880, 0.25); buzz(s.kind === 'rest' ? [80] : [150]);
+    paint();
+  }
+  function paint() {
+    if (!T) return;
+    el.title.textContent = T.title;
+    if (T.done) {
+      el.box.setAttribute('data-kind', 'done');
+      el.label.textContent = 'Done'; el.clock.textContent = '0:00';
+      el.fill.style.width = '100%'; el.next.textContent = 'Nice work. Close when you are ready.';
+      el.pause.textContent = 'Pause'; el.pause.disabled = true;
+      return;
+    }
+    el.pause.disabled = false;
+    var s = T.segs[T.i];
+    el.box.setAttribute('data-kind', s.kind);
+    el.label.textContent = s.label;
+    el.clock.textContent = fmt(Math.max(T.left, 0));
+    var remainMs = T.paused ? T.pausedMs : Math.max(T.endAt - Date.now(), 0);
+    el.fill.style.width = (100 - (remainMs / (s.secs * 1000)) * 100).toFixed(1) + '%';
+    var n = T.segs[T.i + 1];
+    el.next.textContent = n ? 'Next: ' + n.label + ' (' + fmt(n.secs) + ')' : 'Last one';
+    el.pause.textContent = T.paused ? 'Resume' : 'Pause';
+  }
+  document.getElementById('t-close').addEventListener('click', stopTimer);
+  document.getElementById('t-skip').addEventListener('click', function () { advance(); });
+  document.getElementById('t-restart').addEventListener('click', function () {
+    if (!T) return;
+    var segs = T.segs, title = T.title;
+    startTimer(title, segs);
+  });
+  el.pause.addEventListener('click', function () {
+    if (!T || T.done) return;
+    if (T.paused) { T.paused = false; T.endAt = Date.now() + T.pausedMs; }
+    else { T.paused = true; T.pausedMs = Math.max(T.endAt - Date.now(), 0); }
+    paint();
+  });
+
+  /* ---------- shared routines ---------- */
+  var WARM = seq([['Easy jog', 180], ['Leg swings', 40], ['High knees', 30], ['Butt kicks', 30], ['Arm circles', 30], ['Bodyweight squats', 40], ['Walking lunges', 40]]);
+  var COOL = seq([['Slow walk', 180], ['Quad stretch, left', 30], ['Quad stretch, right', 30], ['Hamstring stretch, left', 30], ['Hamstring stretch, right', 30], ['Calf stretch, left', 30], ['Calf stretch, right', 30], ['Hip flexor, left', 30], ['Hip flexor, right', 30]]);
+
+  function absCircuit(rounds) {
+    var moves = ['Bicycle crunches', 'Leg raises', 'Dead bug', 'Mountain climbers', 'Plank'];
+    var out = [];
+    for (var r = 1; r <= rounds; r++) {
+      moves.forEach(function (m, i) {
+        out.push({ label: m + (rounds > 1 ? ' (round ' + r + ')' : ''), secs: 30, kind: 'work' });
+        if (i < moves.length - 1) out.push({ label: 'Rest', secs: 15, kind: 'rest' });
+      });
+      if (r < rounds) out.push({ label: 'Rest', secs: 60, kind: 'rest' });
+    }
+    return out;
+  }
+
+  /* ---------- plan data ---------- */
+  function plan(w) {
+    var n = w === 1 ? 2 : 3;
+    var sets = function (r) { return n + ' sets of ' + r; };
+    return [
+      { id: 'mon', abbr: 'MON', name: 'Stamina', cls: 'stamina', blurb: 'Build the engine for 90 minutes', warm: true, cool: true, ex: [
+        w === 1
+          ? { n: 'Run and walk', d: 'Run 1 min, walk 1 min, 10 times. Run slowly enough that you can still talk.', segs: intervals('Run', 60, 60, 10, 'Walk') }
+          : { n: 'Run and walk', d: 'Run 2 min, walk 1 min, 8 times. Keep the same easy pace.', segs: intervals('Run', 120, 60, 8, 'Walk') },
+        { n: 'Plank', d: n + ' holds of ' + (w === 1 ? 20 : 30) + ' sec, 20 sec rest', segs: intervals('Plank', w === 1 ? 20 : 30, 20, n, 'Rest') },
+        { n: 'Mountain climbers', d: n + ' rounds of 20 sec, 20 sec rest', segs: intervals('Climbers', 20, 20, n, 'Rest') }
+      ] },
+      { id: 'tue', abbr: 'TUE', name: 'Upper body', cls: 'upper', blurb: 'Calisthenics for the lean look', warm: true, cool: true, ex: [
+        { n: 'Push-ups', d: sets('6 to 10 reps') + '. Knees down if you need to.', rest: 45 },
+        { n: 'Pike push-ups', d: sets('6 reps') + '. Hips high, head toward the ground.', rest: 45 },
+        { n: 'Dips on a low wall or bench', d: sets('8 reps') + '. Elbows point straight back.', rest: 45 },
+        { n: 'Superman hold', d: n + ' holds of 15 sec, 20 sec rest. Lie on your belly, lift arms and legs.', segs: intervals('Superman', 15, 20, n, 'Rest') },
+        { n: 'Hang from a bar (optional)', d: 'Only if you find a strong bar or crossbar. 3 hangs of 15 sec.', segs: intervals('Hang', 15, 30, 3, 'Rest') },
+        { n: 'Abs circuit', d: n + ' rounds of 5 moves: bicycle crunches, leg raises, dead bug, mountain climbers, plank. 30 sec each, 15 sec rest.', segs: absCircuit(n) }
+      ] },
+      { id: 'wed', abbr: 'WED', name: 'Speed', cls: 'speed', blurb: 'Quick feet and sharp turns', warm: true, cool: true, ex: [
+        { n: 'Sprints, 20 m', d: (w === 1 ? 6 : 8) + ' sprints. Walk back slowly. Full effort each time.', rest: 60 },
+        { n: 'Side shuffles, 10 m', d: '4 each way. Stay low, feet never cross.', rest: 30 },
+        { n: 'Backpedal, turn, sprint', d: 'Backpedal 10 m, turn, sprint 10 m. Do it 4 times.', rest: 45 },
+        { n: 'Shuttle run 5-10-5 m', d: '3 runs. Touch the line each time.', rest: 60 },
+        { n: 'Jump timing for headers', d: sets('6 jumps') + '. Swing your arms, jump off your toes, land softly on both feet.', rest: 45 }
+      ] },
+      { id: 'thu', abbr: 'THU', name: 'Legs', cls: 'legs', blurb: 'Strong legs, strong tackles', warm: true, cool: true, ex: [
+        { n: 'Squats', d: sets('15 reps'), rest: 45 },
+        { n: 'Reverse lunges', d: sets('10 reps each leg'), rest: 45 },
+        { n: 'Jump squats', d: sets('8 reps') + '. Land softly.', rest: 45 },
+        { n: 'Single-leg glute bridge', d: sets('10 reps each leg'), rest: 30 },
+        { n: 'Calf raises', d: sets('20 reps'), rest: 30 },
+        { n: 'Wall sit', d: n + ' holds of ' + (w === 1 ? 20 : 30) + ' sec, 30 sec rest', segs: intervals('Wall sit', w === 1 ? 20 : 30, 30, n, 'Rest') },
+        { n: 'Abs circuit', d: n + ' rounds of 5 moves: bicycle crunches, leg raises, dead bug, mountain climbers, plank. 30 sec each, 15 sec rest.', segs: absCircuit(n) }
+      ] },
+      { id: 'fri', abbr: 'FRI', name: 'Full-back engine', cls: 'engine', blurb: 'Overlap runs, then recover', warm: true, cool: true, ex: [
+        { n: 'Overlap sprints, 30 m', d: (w === 1 ? 6 : 8) + ' sprints. Jog back, then rest.', rest: 45 },
+        { n: 'Easy jog', d: 'Slow and steady. Walk when you need to.', segs: seq([['Easy jog', 600]]) },
+        { n: 'Abs circuit', d: n + ' rounds of 5 moves: bicycle crunches, leg raises, dead bug, mountain climbers, plank. 30 sec each, 15 sec rest.', segs: absCircuit(n) }
+      ] },
+      { id: 'sat', abbr: 'SAT', name: 'Match day', cls: 'match', blurb: 'Play right-back', warm: true, cool: true, ex: [
+        { n: 'Stay goal-side', d: 'Keep your body between the winger and your goal.', plain: true },
+        { n: 'Jockey, do not dive in', d: 'Back up slowly, wait for a bad touch, then tackle.', plain: true },
+        { n: 'Short and simple passes', d: 'Play to the nearest free teammate, then run to offer again.', plain: true },
+        { n: 'Join the attack late', d: 'When your side has the ball, overlap the winger and look for a shot.', plain: true }
+      ] },
+      { id: 'sun', abbr: 'SUN', name: 'Rest', cls: 'rest', blurb: 'Growing happens today', warm: false, cool: false, ex: [
+        { n: 'Easy walk', d: '20 min. No hurry.', segs: seq([['Easy walk', 1200]]) },
+        { n: 'Light stretching', d: '5 min. Stretch anything that feels tight.', segs: seq([['Stretch', 300]]) },
+        { n: 'Sleep and water', d: 'Aim for 8 hours of sleep. Drink water through the day.', plain: true }
+      ] }
+    ];
+  }
+
+  /* ---------- rehab data ---------- */
+  var AREAS = [
+    { id: 'daily', name: 'Daily 5 min', intro: 'Prevention routine. Do it after training or before bed.', ex: [
+      { n: 'Single-leg balance', d: '30 sec each leg, 2 rounds', segs: sides('Balance', 30, 2, 10) },
+      { n: 'Glute bridge', d: '12 slow reps, 2 sets. Squeeze at the top for 2 sec.', rest: 30 },
+      { n: 'Hip flexor stretch', d: '30 sec each side', segs: seq([['Hip flexor, left', 30], ['Hip flexor, right', 30]]) },
+      { n: 'Calf stretch', d: '30 sec each side', segs: seq([['Calf stretch, left', 30], ['Calf stretch, right', 30]]) },
+      { n: 'Cat-cow', d: '40 sec, slow breathing', segs: seq([['Cat-cow', 40]]) }
+    ] },
+    { id: 'ankle', name: 'Ankle', intro: 'Helps stiff or weak ankles after a roll. Start once walking is pain-free.', ex: [
+      { n: 'Ankle alphabet', d: 'Trace A to Z in the air with your toes, about 60 sec per foot', segs: seq([['Left foot', 60], ['Right foot', 60]]) },
+      { n: 'Single-leg balance', d: '30 sec each leg, 3 rounds. Later try with eyes closed.', segs: sides('Balance', 30, 3, 10) },
+      { n: 'Slow calf raises', d: '12 reps, 2 sets. Up for 2 sec, down for 3 sec.', rest: 30 },
+      { n: 'Toe and heel walks', d: 'Walk on toes 20 sec, then on heels 20 sec, 2 rounds', segs: seq([['Toe walk', 20], ['Heel walk', 20], ['Toe walk', 20], ['Heel walk', 20]]) }
+    ], note: 'A fresh sprain with swelling needs rest and a physio check before these.' },
+    { id: 'knee', name: 'Knee', intro: 'Builds the muscles that protect your knee.', ex: [
+      { n: 'Wall sit', d: '30 sec hold, 3 rounds, 30 sec rest', segs: intervals('Wall sit', 30, 30, 3, 'Rest') },
+      { n: 'Step-ups', d: '10 each leg, 2 sets, on a low step. Go slow.', rest: 30 },
+      { n: 'Glute bridge', d: '12 reps, 2 sets', rest: 30 },
+      { n: 'Straight-leg raise', d: '10 each leg, 2 sets. Lie on your back and keep the leg straight.', rest: 30 },
+      { n: 'Quad stretch', d: '30 sec each leg', segs: seq([['Quad stretch, left', 30], ['Quad stretch, right', 30]]) }
+    ], note: 'A mild ache up to 3 out of 10 is fine. A locking or giving-way knee needs a doctor.' },
+    { id: 'hamstring', name: 'Back of thigh', intro: 'For tight or pulled hamstrings once the sharp pain has gone.', ex: [
+      { n: 'Glute bridge', d: '12 reps, 3 sets', rest: 30 },
+      { n: 'Hip hinge', d: '10 reps, 2 sets. Push hips back, back flat, hands on thighs.', rest: 30 },
+      { n: 'Hamstring stretch', d: '30 sec each leg, 2 rounds. Gentle, no bouncing.', segs: sides('Hamstring', 30, 2, 10) },
+      { n: 'Standing leg swings', d: '10 each leg, front to back', rest: 20 }
+    ], note: 'A sudden sharp pull or a pop means stop and see a physio.' },
+    { id: 'groin', name: 'Groin and hip', intro: 'For tight hips and groin from kicking and sprinting.', ex: [
+      { n: 'Butterfly stretch', d: '30 sec, 2 rounds. Soles together, sit tall.', segs: intervals('Butterfly', 30, 10, 2, 'Rest') },
+      { n: 'Side-lying leg raise', d: '12 each side, 2 sets', rest: 30 },
+      { n: '90/90 hip stretch', d: '30 sec each side', segs: seq([['90/90, left', 30], ['90/90, right', 30]]) },
+      { n: 'Knee squeeze', d: 'Squeeze a pillow or ball between your knees, hold 5 sec, 10 times', rest: 20 }
+    ], note: 'Groin pain when kicking that lasts over a week needs a physio.' },
+    { id: 'shin', name: 'Shin', intro: 'For sore shins when you run more than usual.', ex: [
+      { n: 'Toe raises', d: '15 reps, 2 sets. Back against a wall, lift your toes.', rest: 30 },
+      { n: 'Calf stretch', d: '30 sec each leg', segs: seq([['Calf stretch, left', 30], ['Calf stretch, right', 30]]) },
+      { n: 'Bent-knee calf stretch', d: '30 sec each leg', segs: seq([['Bent-knee calf, left', 30], ['Bent-knee calf, right', 30]]) },
+      { n: 'Walk or jog slowly', d: 'Cut running by half and build up slowly, no more than 10 percent a week.', plain: true }
+    ], note: 'A spot on the bone that hurts when pressed means rest from running and see a physio.' },
+    { id: 'back', name: 'Lower back', intro: 'Gentle movement for a stiff lower back.', ex: [
+      { n: 'Cat-cow', d: '40 sec, slow breathing', segs: seq([['Cat-cow', 40]]) },
+      { n: 'Bird dog', d: '8 each side, 2 sets. Hold 3 sec at the top.', rest: 30 },
+      { n: 'Child pose', d: '30 sec. Sit back on your heels, arms forward.', segs: seq([['Child pose', 30]]) },
+      { n: 'Glute bridge', d: '12 reps, 2 sets', rest: 30 }
+    ], note: 'Numbness, tingling down a leg or pain that wakes you at night needs a doctor.' }
+  ];
+
+  /* ---------- renderers ---------- */
+  function exRow(ex) {
+    var row = h('div', 'ex' + (ex.plain ? ' plain' : ''));
+    row.appendChild(h('div', 'ex-txt', null, [h('div', 'ex-name', ex.n), h('div', 'ex-det', ex.d)]));
+    if (ex.segs) {
+      var b = h('button', 'go', 'Start ' + fmt(total(ex.segs)));
+      b.setAttribute('aria-label', 'Start timer for ' + ex.n);
+      b.addEventListener('click', function () { startTimer(ex.n, ex.segs); });
+      row.appendChild(b);
+    } else if (ex.rest) {
+      var r = h('button', 'go rest', 'Rest ' + ex.rest + 's');
+      r.setAttribute('aria-label', 'Start ' + ex.rest + ' second rest timer');
+      r.addEventListener('click', function () { startTimer('Rest', [{ label: 'Rest', secs: ex.rest, kind: 'rest' }]); });
+      row.appendChild(r);
+    }
+    return row;
+  }
+  function routineRow(label, info, segs, cls) {
+    var row = h('div', 'bar-row' + (cls ? ' ' + cls : ''));
+    row.appendChild(h('div', 't', null, [h('b', null, label), document.createTextNode(' ' + info)]));
+    var b = h('button', 'go', 'Start ' + fmt(total(segs)));
+    b.setAttribute('aria-label', 'Start ' + label + ' timer');
+    b.addEventListener('click', function () { startTimer(label, segs); });
+    row.appendChild(b);
+    return row;
+  }
+
+  function renderPlan(root) {
+    var seg = h('div', 'seg');
+    [1, 2].forEach(function (w) {
+      var b = h('button', null, 'Week ' + w);
+      b.setAttribute('aria-pressed', String(S.week === w));
+      b.addEventListener('click', function () { S.week = w; save(); render(); });
+      seg.appendChild(b);
+    });
+    root.appendChild(seg);
+    root.appendChild(h('p', 'note', S.week === 1
+      ? 'Week 1: 2 sets of each exercise. Go easy and learn the moves.'
+      : 'Week 2: 3 sets of each exercise and longer runs. Then add the gym.'));
+    root.appendChild(h('div', 'tips', null, [
+      h('div', 'tip', null, [h('b', null, 'Every training day: '), document.createTextNode('warm up first, cool down after, and drink water.')]),
+      h('div', 'tip', null, [h('b', null, 'Tap Start '), document.createTextNode('on any timed exercise. The timer beeps and buzzes when it changes.')]),
+      h('div', 'tip', null, [h('b', null, 'Your height is a weapon. '), document.createTextNode('Tall defenders win headers and set pieces. Practise timing your jump on Wednesdays, not just jumping high.')])
+    ]));
+    plan(S.week).forEach(function (d) {
+      var key = 'w' + S.week + '-' + d.id;
+      var card = h('section', 'card ' + d.cls + (S.done[key] ? ' is-done' : ''));
+      var head = h('div', 'card-h');
+      head.appendChild(h('div', 'abbr', d.abbr));
+      head.appendChild(h('div', 'ttl', null, [h('h2', null, d.name), h('div', 'bl', d.blurb)]));
+      var done = h('button', 'done-btn', S.done[key] ? 'Done' : 'Mark done');
+      done.setAttribute('aria-pressed', String(!!S.done[key]));
+      done.addEventListener('click', function () { if (S.done[key]) delete S.done[key]; else S.done[key] = true; save(); render(); });
+      head.appendChild(done);
+      card.appendChild(head);
+      var body = h('div', 'card-b');
+      if (d.warm) body.appendChild(routineRow('Warm-up', 'about 7 min', WARM));
+      d.ex.forEach(function (ex) { body.appendChild(exRow(ex)); });
+      if (d.cool) body.appendChild(routineRow('Cool-down', 'about 7 min', COOL, 'last'));
+      card.appendChild(body);
+      root.appendChild(card);
+    });
+  }
+
+  function renderRehab(root) {
+    root.appendChild(h('div', 'warn', null, [
+      h('h3', null, 'Before you start'),
+      (function () {
+        var ul = h('ul');
+        ['Go slow. Pain up to 3 out of 10 is fine, sharp pain is not.',
+         'Stop if the pain goes to 4 or more, or gets worse the next day.',
+         'See a doctor or physio for swelling, a pop, numbness, a joint that gives way, or no improvement in 3 to 5 days.'
+        ].forEach(function (t) { ul.appendChild(h('li', null, t)); });
+        return ul;
+      })()
+    ]));
+    root.appendChild(h('p', 'note', 'Where does it feel tight or sore?'));
+    var wrap = h('div', 'areas');
+    AREAS.forEach(function (a) {
+      var b = h('button', 'area', a.name);
+      b.setAttribute('aria-pressed', String(S.area === a.id));
+      b.addEventListener('click', function () { S.area = a.id; save(); render(); });
+      wrap.appendChild(b);
+    });
+    root.appendChild(wrap);
+    var a = AREAS.filter(function (x) { return x.id === S.area; })[0] || AREAS[0];
+    var card = h('section', 'card rehab');
+    card.appendChild(h('div', 'card-h', null, [h('div', 'ttl', null, [h('h2', null, a.name), h('div', 'bl', a.intro)])]));
+    var body = h('div', 'card-b');
+    a.ex.forEach(function (ex) { body.appendChild(exRow(ex)); });
+    if (a.note) body.appendChild(h('div', 'callout', a.note));
+    card.appendChild(body);
+    root.appendChild(card);
+  }
+
+  function pills(list) { return h('div', 'pills', null, list.map(function (t) { return h('span', 'pill', t); })); }
+  function fuelCard(cls, title, sub, list) {
+    var c = h('section', 'card ' + cls);
+    c.appendChild(h('div', 'card-h', null, [h('div', 'ttl', null, [h('h2', null, title), h('div', 'bl', sub)])]));
+    var b = h('div', 'card-b'); b.appendChild(pills(list)); c.appendChild(b);
+    return c;
+  }
+  function renderFuel(root) {
+    root.appendChild(h('p', 'note', 'At 6 ft and 75 kg you are in a healthy range, so there is no need to bulk up. Eat enough to fuel training and recover, and aim for about 105 to 135 g of protein a day. These foods are cheap and easy to find.'));
+    var ab = h('section', 'card engine');
+    ab.appendChild(h('div', 'card-h', null, [h('div', 'ttl', null, [h('h2', null, 'Showing your abs'), h('div', 'bl', 'What actually makes a six-pack appear')])]));
+    var abb = h('div', 'card-b');
+    [['Built in training, revealed by body fat', 'You already have abs muscles. They show when your body fat is low enough, usually around 10 to 15 percent for men.'],
+     ['Sit-ups cannot burn belly fat', 'Fat comes off your whole body. Abs work makes the muscle thicker, and your overall fat level decides when it shows.'],
+     ['Do not crash diet', 'Skipping meals costs you energy and muscle. Eat regular meals, and cut sugary drinks and heavy fried food instead.'],
+     ['Sleep 7 to 9 hours', 'Poor sleep makes recovery and fat loss harder.'],
+     ['Be patient', 'It usually takes a few months of steady training and eating well. Take a photo every 2 weeks to see your progress.']
+    ].forEach(function (r) { abb.appendChild(exRow({ n: r[0], d: r[1], plain: true })); });
+    ab.appendChild(abb);
+    root.appendChild(ab);
+    root.appendChild(fuelCard('stamina', 'Before training', '45 to 90 min before', ['Banana and groundnuts', 'Bread and peanut butter', 'Roasted corn', 'Boiled or roasted plantain', 'Pap (ogi)']));
+    root.appendChild(fuelCard('upper', 'During a game', 'Small and simple', ['Water, sipped often', 'Orange slices', 'Half a banana at halftime']));
+    root.appendChild(fuelCard('match', 'After training', 'Within 1 hour', ['Eggs with boiled yam or potato', 'Moi moi or akara with pap', 'Rice with chicken or fish', 'Yoghurt and fruit', 'Groundnuts']));
+    root.appendChild(fuelCard('legs', 'Protein guide', 'Rough amounts, to help you reach your daily target', ['1 egg: about 6 g', '100 g chicken: about 27 g', '100 g fish: about 22 g', '1 cup beans: about 15 g', 'Handful of groundnuts: about 7 g', '1 cup milk or yoghurt: about 8 g']));
+    var c = h('section', 'card fuel');
+    c.appendChild(h('div', 'card-h', null, [h('div', 'ttl', null, [h('h2', null, 'Match day timeline'), h('div', 'bl', 'What to eat and when')])]));
+    var b = h('div', 'card-b'); var tl = h('div', 'timeline');
+    [['3 to 4 h before', 'Full meal, such as rice or yam with eggs, fish or chicken. Go light on oil and pepper.'],
+     ['45 to 60 min before', 'Small snack: banana, dates, or bread with peanut butter.'],
+     ['During', 'Sip water. Do not gulp.'],
+     ['Halftime', 'Orange slices or half a banana, plus water.'],
+     ['Within 1 h after', 'Protein and carbs, such as eggs with yam, or rice with fish.']
+    ].forEach(function (r) { tl.appendChild(h('div', 'tl', null, [h('div', 'when', r[0]), h('div', null, r[1])])); });
+    b.appendChild(tl); c.appendChild(b); root.appendChild(c);
+    root.appendChild(h('div', 'tip', null, [h('b', null, 'Water check: '), document.createTextNode('pale yellow pee means you are drinking enough. Dark yellow means drink more.')]));
+  }
+
+  function render() {
+    var root = document.getElementById('view');
+    root.textContent = '';
+    ['plan', 'rehab', 'fuel'].forEach(function (t) {
+      var tb = document.getElementById('tab-' + t);
+      tb.setAttribute('aria-selected', String(S.tab === t));
+    });
+    if (S.tab === 'rehab') renderRehab(root);
+    else if (S.tab === 'fuel') renderFuel(root);
+    else renderPlan(root);
+  }
+
+  document.querySelector('.tabs').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-tab]');
+    if (!b) return;
+    S.tab = b.getAttribute('data-tab'); save(); render();
+    var t = document.querySelector('.tabs');
+    var top = t.getBoundingClientRect().top + window.scrollY - 4;
+    if (window.scrollY > top) window.scrollTo(0, top);
+  });
+
+  render();
+})();
+</script>
+
+</body></html>
